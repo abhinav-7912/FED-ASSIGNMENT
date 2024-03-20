@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart</title>
+    <style>
+        body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+}
+header{
+     background-color: #2874f0;
+     margin:0;
+     padding: 10px 0;
+     text-align: center;
+
+}
+header img{
+    max-width: 200px;
+}
+
+.container {
+    max-width: 1500px;
+    margin: 0;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    color: #0a0a0a;
+    font-size: 36px;
+    margin-bottom: 20px;
+}
+
+.product {
+    display: inline-block;
+    border: 1px solid;
+    vertical-align: top;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: #fff;
+    width: 30%;
+    border-radius: 8px;
+    margin-right: 20px;
+    margin: 10px;
+    transition: all 0.3s ease;
+
+   
+
+}
+.product img {
+    max-width: 150px;
+    margin: 10px;
+
+}
+
+.product-info {
+    padding: 10px;
+            border-bottom: 1px solid #ccc;
+            text-align: bottom;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 25px;
+            font-family:'Times New Roman', Times, serif ;
+}
+
+.product button {
+    font-size: 20px;
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color:#fb641b ;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.product button:hover {
+    background-color: #fb641b;
+    transform:translateY(-5px);
+}
+
+.cart {
+    margin-top: 20px;
+    border-top: 2px solid #ff9f00;
+    padding-top: 20px;
+}
+
+.cart h2 {
+    font-size:40px;
+    color: #030303;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.cart ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.cart li {
+    margin-bottom: 10px;
+    font-size: 25px;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+}
+
+.cart li button {
+    padding: 8px 15px;
+    color: #040404;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.cart li button:hover {
+    background-color:#2874f0 ;
+}
+
+.total {
+    color: #333;
+    text-align: right;
+    margin-top: 20px;
+    font-size: 24px;
+    font-weight: bold;
+}
+    </style>
+</head>
+<body>
+    <header>
+        <img src="Flipkart-Logo-2007.png" alt="logo">
+    </header>
+    <div class="container">
+        
+        <div id="products" class="products">
+        </div>
+        <div class="cart">
+            <h2>My Cart</h2>
+            <ul id="cart-items">
+            </ul>
+            <div class="total">Total: $<span id="totalAmount">0</span></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const productsContainer = document.getElementById('products');
+            const cartItems = document.getElementById('cart-items');
+            const totalAmountElement = document.getElementById('totalAmount');
+            let totalAmount = 0;
+            const cartMap = new Map(); // To store cart items
+
+            const products = [
+                { id: 1, name: 'T-shirts', image: 'c1.jpg', price: 100 },
+                { id: 2, name: 'Jacket', image: 'p2594902.jpg', price: 135 },
+                { id: 3, name: 'Coat', image: '61h2RI+t5mL._AC_UY1100_.jpg', price: 250 },
+                { id: 4, name: 'Jeans', image: '843266fc27a1e5ec6e37f7b31086a421.jpg', price: 150 }
+            ];
+
+            products.forEach(product => {
+                const productDiv = document.createElement('div');
+                productDiv.classList.add('product');
+                productDiv.setAttribute('data-id', product.id);
+                productDiv.innerHTML = `
+                    <img src="${product.image}" alt="${product.name}">
+                    <div class="product-info">
+                        <span>${product.name}</span><br>
+                        <span class="price">$${product.price}</span>
+                    </div>
+                    <button class="add-to-cart">Add to Cart</button>
+                `;
+                productsContainer.appendChild(productDiv);
+            });
+
+            const addToCartButtons = document.querySelectorAll('.add-to-cart');
+            addToCartButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const productDiv = button.parentElement;
+                    const productId = productDiv.getAttribute('data-id');
+                    const productName = productDiv.querySelector('.product-info span:first-child').textContent;
+                    const price = parseFloat(productDiv.querySelector('.price').textContent.replace('$', ''));
+
+                    if (cartMap.has(productId)) {
+                        // If the product is already in the cart, increment its quantity and update the UI
+                        const cartItem = cartMap.get(productId);
+                        cartItem.quantity++;
+                        cartItem.element.querySelector('.quantity').textContent = cartItem.quantity;
+                    } else {
+                        // If the product is not in the cart, add it to the cart and update the UI
+                        const cartItem = document.createElement('li');
+                        cartItem.innerHTML = `
+                            <span>${productName} - $${price} <span class="quantity">1</span>x</span>
+                            <button class="remove-from-cart" data-id="${productId}">Remove</button>
+                        `;
+                        cartItems.appendChild(cartItem);
+                        cartMap.set(productId, { name: productName, price: price, quantity: 1, element: cartItem });
+                    }
+
+                    // Update total amount
+                    totalAmount += price;
+                    totalAmountElement.textContent = totalAmount.toFixed(2);
+                });
+            });
+
+            cartItems.addEventListener('click', function(event) {
+                if (event.target.classList.contains('remove-from-cart')) {
+                    const productId = event.target.getAttribute('data-id');
+                    const cartItem = cartMap.get(productId);
+                    const price = cartItem.price;
+                    const quantity = cartItem.quantity;
+                    
+                    if (quantity > 1) {
+                        // If the product quantity is more than 1, decrement its quantity and update the UI
+                        cartItem.quantity--;
+                        cartItem.element.querySelector('.quantity').textContent = cartItem.quantity;
+                    } else {
+                        // If the product quantity is 1, remove it from the cart and update the UI
+                        cartItems.removeChild(cartItem.element);
+                        cartMap.delete(productId);
+                    }
+
+                    // Update total amount
+                    totalAmount -= price;
+                    totalAmountElement.textContent = totalAmount.toFixed(2);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

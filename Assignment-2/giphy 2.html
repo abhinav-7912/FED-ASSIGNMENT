@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Giphy Page</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color:black;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+            max-width: 2000px;
+            margin: 10px auto;
+            padding: 5px;
+        }
+        img{
+            max-width: 80px;
+            max-height: 80px;
+            float: left;
+            margin-top: auto;
+            display: flex;
+        }
+    h1{
+            text-align:left;
+            margin-bottom: 5px;
+            color:white;
+            font-family: 'Arial black';
+            font-weight: bold;
+            font-size: xx-large;
+
+    }
+
+    #search-container {
+      text-align: center;
+      padding: 5px;
+      border-radius: 1px;
+      margin-bottom: 20px;
+    }
+
+    #search-input {
+        width: 70%;
+        height: 70%;
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-right: 8px;
+      border: 1px solid #ddd;
+      border-radius: 0px;
+      margin right: 10px;
+    }
+
+    #search-button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color:  #ff6b6b;
+      color: #fff;
+      border: 0px;
+      border-radius: 1px;
+      cursor: pointer;
+    }
+
+    #search-button:hover {
+      background-color: #45a049;
+    }
+
+    #gif-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .gif-item {
+      margin: 10px;
+    }
+
+    img {
+      max-width: 1000%;
+      height:auto;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+    }
+
+    img:hover {
+      transform: scale(0.1);
+    }
+  </style>
+</head>
+<body>
+    <div class="container">
+        <img src="free-giphy-461796.png" alt="logo">
+    <h1>GIPHY</h1>
+  <div id="search-container">
+    
+    <label for="search-input"></label>
+    <input type="text" id="search-input">
+    <button id="search-button" onclick="searchGiphy()">Search</button>
+  </div>
+
+  <div id="gif-container"></div>
+  </div>
+
+  <script>
+    const apiKey = 'QnaVSADx13uh9KnqGShm7MIR34yauFDZ';
+    
+    function displayRandomGifs(numberOfGifs) {
+      for (let i = 0; i < numberOfGifs; i++) {
+        fetch(`https://api.giphy.com/v1/gifs/random?api_key=${apiKey}`)
+          .then(response => response.json())
+          .then(data => {
+            const gifContainer = document.getElementById('gif-container');
+            const gifItem = document.createElement('div');
+            gifItem.className = 'gif-item';
+
+            const img = document.createElement('img');
+            img.src = data.data.images.original.url;
+            img.alt = data.data.title;
+
+            gifItem.appendChild(img);
+            gifContainer.appendChild(gifItem);
+          })
+          .catch(error => console.error('Error fetching random GIF:', error));
+      }
+    }
+
+    // Function to search and display GIFs based on user input
+    function searchGiphy() {
+      const searchInput = document.getElementById('search-input').value;
+
+      // Make a request to the Giphy API
+      fetch(`https://api.giphy.com/v1/gifs/search?q=${searchInput}&api_key=${apiKey}&limit=60`)
+        .then(response => response.json())
+        .then(data => displayGifs(data.data))
+        .catch(error => console.error('Error fetching data:', error));
+    }
+
+    // Function to display GIFs
+    function displayGifs(gifs) {
+      const gifContainer = document.getElementById('gif-container');
+      gifContainer.innerHTML = '';
+
+      gifs.forEach(gif => {
+        const gifItem = document.createElement('div');
+        gifItem.className = 'gif-item';
+
+        const img = document.createElement('img');
+        img.src = gif.images.original.url;
+        img.alt = gif.title;
+
+        gifItem.appendChild(img);
+        gifContainer.appendChild(gifItem);
+      });
+    }
+    displayRandomGifs(60);
+  </script>
+</body>
+</html>
